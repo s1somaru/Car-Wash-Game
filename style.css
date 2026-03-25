@@ -544,21 +544,6 @@ header {
     100% { transform: scale(1) translateY(0); opacity: 1; }
 }
 
-/* デバッグ情報 */
-.debug-info {
-    position: fixed;
-    bottom: 10px;
-    right: 10px;
-    font-family: monospace;
-    font-size: 12px;
-    color: rgba(255, 255, 255, 0.4);
-    background: rgba(0,0,0,0.6);
-    padding: 6px 10px;
-    border-radius: 6px;
-    z-index: 1000;
-    pointer-events: none;
-}
-
 /* レスポンシブ対応 */
 @media (max-width: 600px) {
     .stage { height: 320px; }

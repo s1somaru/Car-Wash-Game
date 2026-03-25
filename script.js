@@ -21,10 +21,6 @@ document.addEventListener('DOMContentLoaded', () => {
     let splatterTimeoutId;
     let splatterStopTime = 0; // 汚れの発生が止まる時間（目標時間から何ミリ秒前か）
 
-    // --- デバッグ要素 ---
-    const debugTime = document.getElementById('debug-time');
-    const debugStop = document.getElementById('debug-stop');
-
     // --- 音声エフェクト (Web Audio API) ---
     const AudioContext = window.AudioContext || window.webkitAudioContext;
     let audioCtx = null;
@@ -180,7 +176,6 @@ document.addEventListener('DOMContentLoaded', () => {
         
         // 汚れの停止時間をランダムにし、特定の秒数固定による攻略を防ぐ（500ms ~ 2000ms）
         splatterStopTime = Math.random() * 1500 + 500;
-        if(debugStop) debugStop.textContent = (splatterStopTime / 1000).toFixed(2);
         
         // 車体を完全に汚れた状態にリセット
         carModel.className = 'car-model is-dirty';
@@ -225,9 +220,6 @@ document.addEventListener('DOMContentLoaded', () => {
         
         // 表示の更新（フェードアウト後も見えないだけでDOM自体は更新し続ける）
         currentDisplay.textContent = (elapsed / 1000).toFixed(2).padStart(5, '0') + 's';
-        
-        // デバッグ用表示
-        if(debugTime) debugTime.textContent = (elapsed / 1000).toFixed(2);
         
         animationFrameId = requestAnimationFrame(updateTimer);
     }
