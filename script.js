@@ -266,10 +266,10 @@ document.addEventListener('DOMContentLoaded', () => {
         s.dataset.health = "100"; // 汚れの耐久値
         
         const carWidth = carModel.offsetWidth;
-        // 車体の長さ内のどこかにランダムに配置
-        const x = Math.random() * (carWidth * 0.8) + (carWidth * 0.1);
-        const y = Math.random() * 80 + 20; // 床から 20px - 100px の範囲
-        const size = Math.random() * 15 + 25; // 25px - 40px のサイズ
+        // spawn anywhere on the car's body length (端に寄りすぎないよう 20%〜80% の範囲に限定)
+        const x = Math.random() * (carWidth * 0.6) + (carWidth * 0.2);
+        const y = Math.random() * 80 + 20; // 20px to 100px from floor
+        const size = Math.random() * 15 + 25; // 25px - 40px
         
         s.style.width = `${size}px`;
         s.style.height = `${size}px`;
@@ -428,7 +428,7 @@ document.addEventListener('DOMContentLoaded', () => {
         let newLeft = machineStartLeft + dx;
         
         // 画面外への移動を制限（スマホなどで端の汚れに届くように可動域を拡大）
-        const padding = 0; // ステージの真フチまで中心がいけるように緩和
+        const padding = 60; // 画面端を少し超える程度まで引っ張れるように緩和
         const maxLeft = stage.clientWidth + padding;
         const minLeft = -padding;
         
