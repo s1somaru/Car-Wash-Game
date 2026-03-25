@@ -546,10 +546,50 @@ header {
 
 /* レスポンシブ対応 */
 @media (max-width: 600px) {
-    .stage { height: 320px; }
-    .car-model { transform: scale(0.8); transform-origin: bottom center; }
-    .machine { transform: translateX(-50%) scale(0.8); transform-origin: bottom center; }
-    .title { font-size: 2.2rem; }
-    .btn { padding: 15px 25px; font-size: 1rem; }
-    .result-message { min-width: 90%; }
+    body { padding: 10px; }
+    .title { 
+        font-size: 1.7rem; 
+        margin-bottom: 5px; 
+    }
+    .subtitle { 
+        font-size: 0.9rem; 
+        word-break: keep-all; 
+        margin-bottom: 15px; 
+        padding: 0 10px;
+        line-height: 1.4;
+    }
+    .led-board { 
+        min-width: 260px; 
+        padding: 10px 15px; 
+    }
+    .led-row { font-size: 22px; margin: 4px 0; }
+    .led-value { min-width: 100px; }
+    
+    .stage { height: 260px; margin-bottom: 15px; }
+    .car-model { transform: scale(0.65); transform-origin: bottom center; }
+    .machine { transform: translateX(-50%) scale(0.65); transform-origin: bottom center; }
+    
+    .controls {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+        width: 100%;
+        margin-bottom: 15px;
+    }
+    .btn { 
+        padding: 15px 5px; 
+        font-size: 0.95rem; 
+        width: 100%;
+        white-space: nowrap;
+    }
+    #next-btn {
+        grid-column: 1 / -1; /* 次へボタンは全幅を使う */
+    }
+    
+    .result-message { 
+        min-width: 95%; 
+        padding: 15px 20px;
+    }
+    .result-message h2 { font-size: 1.5rem; }
+    .result-message p { font-size: 0.95rem; }
 }
