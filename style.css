@@ -53,6 +53,9 @@ header {
     font-size: 1.1rem;
     margin-bottom: 20px;
 }
+.sp-only {
+    display: none;
+}
 
 /* 電光掲示板 */
 .led-board {
@@ -553,10 +556,12 @@ header {
     }
     .subtitle { 
         font-size: 0.9rem; 
-        word-break: keep-all; 
         margin-bottom: 15px; 
         padding: 0 10px;
         line-height: 1.4;
+    }
+    .sp-only { 
+        display: block; 
     }
     .led-board { 
         min-width: 260px; 
