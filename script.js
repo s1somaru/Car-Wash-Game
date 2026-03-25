@@ -427,10 +427,10 @@ document.addEventListener('DOMContentLoaded', () => {
         const dx = e.clientX - startX;
         let newLeft = machineStartLeft + dx;
         
-        // 画面外への移動を制限（スマホなどで端の汚れに届くように可動域を拡大）
-        const padding = 60; // 画面端を少し超える程度まで引っ張れるように緩和
-        const maxLeft = stage.clientWidth + padding;
-        const minLeft = -padding;
+        // 画面外への移動を制限（機体が完全に隠れてしまわないように自身の幅で制限）
+        const halfWidth = machine.offsetWidth / 2;
+        const maxLeft = stage.clientWidth - halfWidth;
+        const minLeft = halfWidth;
         
         newLeft = Math.max(minLeft, Math.min(maxLeft, newLeft));
         machine.style.left = `${newLeft}px`;
