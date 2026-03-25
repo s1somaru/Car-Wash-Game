@@ -1,0 +1,570 @@
+:root {
+    --car-color: #ff3366;
+    --led-color: #00ffcc;
+    --led-target: #ffcc00;
+    --bg-dark: #0a0e17;
+    --bg-stage: #1a1e29;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    background-color: var(--bg-dark);
+    color: #fff;
+    font-family: 'Outfit', sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+    overflow-x: hidden;
+    padding: 20px;
+}
+
+#app {
+    width: 100%;
+    max-width: 900px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+header {
+    text-align: center;
+    width: 100%;
+    margin-bottom: 30px;
+}
+
+.title {
+    font-size: 3rem;
+    font-weight: 900;
+    text-transform: uppercase;
+    color: #f0f4f8;
+    text-shadow: 0 4px 10px rgba(0, 0, 0, 0.5), 0 0 15px rgba(100, 200, 255, 0.3);
+    letter-spacing: 2px;
+    margin-bottom: 5px;
+}
+
+.subtitle {
+    color: #8892b0;
+    font-size: 1.1rem;
+    margin-bottom: 20px;
+}
+
+/* 電光掲示板 */
+.led-board {
+    background: #050505;
+    border: 4px solid #333;
+    border-radius: 12px;
+    padding: 15px 30px;
+    display: inline-block;
+    font-family: 'Orbitron', monospace;
+    box-shadow: inset 0 0 20px #000, 0 10px 20px rgba(0,0,0,0.5);
+    min-width: 320px;
+    position: relative;
+}
+.led-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 8px 0;
+    font-size: 28px;
+    font-weight: 700;
+}
+.led-label {
+    color: #555;
+    font-size: 18px;
+    letter-spacing: 2px;
+}
+.led-value {
+    font-variant-numeric: tabular-nums; /* 数字の幅を一定にする */
+    letter-spacing: 2px;
+    min-width: 120px;
+    text-align: right;
+}
+#target-time {
+    color: var(--led-target);
+    text-shadow: 0 0 15px var(--led-target);
+}
+#current-time {
+    color: var(--led-color);
+    text-shadow: 0 0 15px var(--led-color);
+    transition: opacity 1.5s ease-in, filter 1.5s ease-in;
+}
+#current-time.fade-out {
+    opacity: 0;
+    filter: blur(10px);
+}
+
+/* ステージ */
+.stage {
+    position: relative;
+    width: 100%;
+    height: 400px;
+    background: linear-gradient(180deg, #10141e 0%, #202635 60%, #151822 100%);
+    border-radius: 16px;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.6), inset 0 0 100px rgba(0,0,0,0.5);
+    overflow: hidden;
+    margin-bottom: 30px;
+    display: flex;
+    justify-content: center;
+}
+
+.garage-lights {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: repeating-linear-gradient(90deg, transparent, transparent 100px, rgba(255,255,255,0.03) 100px, rgba(255,255,255,0.03) 200px);
+    pointer-events: none;
+}
+
+.floor {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    height: 60px;
+    background: linear-gradient(90deg, #2a2d36, #3a3f4e, #2a2d36);
+    border-top: 4px solid #4a5468;
+    z-index: 1;
+    box-shadow: inset 0 20px 20px rgba(0,0,0,0.4);
+}
+
+/* 車体の基本構造 */
+.car-wrapper {
+    position: absolute;
+    bottom: 60px; /* Sits exactly on the floor line */
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 5;
+    pointer-events: none; /* Let clicks pass through to machine */
+}
+
+.car-model {
+    position: relative;
+    height: 150px;
+    /* dynamic width applied via JS, default 300px for sedan */
+    width: 300px;
+    transition: width 0.6s cubic-bezier(0.34, 1.56, 0.64, 1), transform 0.4s ease;
+}
+
+/* 車の形状 */
+.car-body-bottom {
+    position: absolute;
+    bottom: 25px;
+    width: 100%;
+    height: 55px;
+    background: var(--car-color);
+    border-radius: 30px 45px 15px 15px;
+    box-shadow: inset 0 -15px 25px rgba(0,0,0,0.3), inset 0 10px 15px rgba(255,255,255,0.2), 0 15px 15px rgba(0,0,0,0.4);
+    overflow: hidden;
+    transition: background 0.5s ease;
+}
+
+.car-roof {
+    position: absolute;
+    bottom: 78px;
+    left: 15%;
+    width: 60%;
+    height: 65px;
+    background: var(--car-color);
+    clip-path: polygon(25% 0, 75% 0, 100% 100%, 0% 100%);
+    box-shadow: inset 0 15px 15px rgba(255,255,255,0.3);
+    overflow: hidden;
+    transition: background 0.5s ease;
+}
+
+.car-window {
+    position: absolute;
+    bottom: 80px;
+    height: 55px;
+    background: linear-gradient(135deg, #111, #444);
+    border: 3px solid var(--car-color);
+    overflow: hidden;
+    transition: border-color 0.5s ease;
+}
+
+.car-window.front {
+    left: 18%;
+    width: 25%;
+    clip-path: polygon(20% 0, 100% 0, 100% 100%, 0% 100%);
+}
+
+.car-window.rear {
+    left: 45%;
+    width: 25%;
+    clip-path: polygon(0 0, 80% 0, 100% 100%, 0 100%);
+}
+
+.wheel {
+    position: absolute;
+    bottom: 0px;
+    width: 55px;
+    height: 55px;
+    background: #111;
+    border-radius: 50%;
+    border: 6px solid #aaa;
+    box-shadow: 0 10px 15px rgba(0,0,0,0.5), inset 0 -5px 10px rgba(0,0,0,0.8);
+    transition: transform 0.4s ease;
+}
+
+.wheel .rim {
+    position: absolute;
+    top: 50%; left: 50%;
+    width: 24px; height: 24px;
+    background: #ddd;
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    box-shadow: inset 0 0 10px #000;
+}
+
+.wheel.front-wheel { left: 12%; }
+.wheel.rear-wheel { right: 12%; }
+
+.headlight {
+    position: absolute;
+    bottom: 50px;
+    right: 0;
+    width: 15px;
+    height: 20px;
+    background: #ffffcc;
+    border-radius: 50% 0 0 50%;
+    box-shadow: 10px 0 20px rgba(255, 255, 150, 0.6);
+}
+
+.taillight {
+    position: absolute;
+    bottom: 52px;
+    left: 0;
+    width: 12px;
+    height: 22px;
+    background: #ff2222;
+    border-radius: 0 50% 50% 0;
+    box-shadow: -10px 0 20px rgba(255, 0, 0, 0.8);
+}
+
+/* 汚れ（障害物） */
+.splatter-container {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    pointer-events: none;
+    z-index: 15;
+}
+.splatter {
+    position: absolute;
+    background: radial-gradient(circle at 30% 30%, #3a2a1a 0%, #1a1005 80%);
+    border-radius: 40% 60% 70% 30% / 50% 40% 60% 50%;
+    pointer-events: none;
+    box-shadow: 2px 2px 4px rgba(0,0,0,0.5), inset -2px -2px 5px rgba(0,0,0,0.5);
+    opacity: 0;
+    transform: rotate(var(--rot, 0deg)) scale(0);
+    transition: opacity 0.1s, transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+.splatter.splat-in {
+    opacity: 1;
+    transform: rotate(var(--rot, 0deg)) scale(var(--scale, 1));
+}
+.splatter.cleaned {
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    opacity: 0 !important;
+    transform: rotate(var(--rot, 0deg)) scale(1.5) !important;
+}
+
+/* 結果別のスタイル（汚れた状態） */
+.dirt-layer {
+    position: absolute;
+    top: -50%; left: -50%; right: -50%; bottom: -50%;
+    background-image: 
+        radial-gradient(circle at 30% 40%, rgba(60, 40, 20, 0.8) 0%, transparent 40%),
+        radial-gradient(circle at 70% 60%, rgba(80, 50, 25, 0.7) 0%, transparent 35%),
+        radial-gradient(circle at 50% 20%, rgba(70, 45, 25, 0.9) 0%, transparent 45%),
+        radial-gradient(circle at 10% 80%, rgba(50, 30, 10, 0.8) 0%, transparent 30%);
+    opacity: 0;
+    transition: opacity 1s ease;
+    pointer-events: none;
+    mix-blend-mode: multiply;
+}
+.wheel .dirt-layer {
+    background-image: radial-gradient(circle at 50% 50%, rgba(60, 40, 20, 0.9) 30%, transparent 80%);
+}
+
+.car-model.is-dirty .dirt-layer {
+    opacity: 1;
+}
+
+/* ダメージ状態（遅すぎた場合） */
+.scratch-layer {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+    background-image: 
+        linear-gradient(45deg, transparent 40%, rgba(0,0,0,0.6) 41%, rgba(0,0,0,0.6) 43%, transparent 44%),
+        linear-gradient(-30deg, transparent 50%, rgba(0,0,0,0.5) 51%, rgba(0,0,0,0.5) 52%, transparent 53%);
+    pointer-events: none;
+}
+.car-model.is-damaged .car-body-bottom {
+    background: repeating-linear-gradient(45deg, rgb(from var(--car-color) r g b / 0.8), rgb(from var(--car-color) r g b / 0.8) 10px, #444 10px, #444 20px);
+}
+.car-model.is-damaged .scratch-layer {
+    opacity: 1;
+}
+.car-model.is-damaged {
+    transform: rotate(3deg) translateY(10px);
+}
+.car-model.is-damaged .front-wheel {
+    transform: translate(-10px, 5px) rotate(-15deg);
+}
+.car-model.is-damaged .rear-wheel {
+    transform: translate(15px, 8px) rotate(25deg);
+    border-color: #f44;
+}
+
+/* 完璧な状態 */
+.car-model.is-perfect {
+    filter: drop-shadow(0 0 20px rgba(255, 255, 255, 0.4)) brightness(1.3) contrast(1.1);
+}
+.car-model.is-perfect::before,
+.car-model.is-perfect::after {
+    content: '✦';
+    position: absolute;
+    color: #fff;
+    font-size: 40px;
+    z-index: 20;
+    animation: sparkle-spin 2s infinite linear;
+    text-shadow: 0 0 10px #fff, 0 0 20px #0ff;
+    pointer-events: none;
+}
+.car-model.is-perfect::before { top: 10px; left: 10%; animation-duration: 1.5s; }
+.car-model.is-perfect::after { top: 30px; right: 20%; font-size: 55px; animation-duration: 2.2s; animation-direction: reverse; }
+
+@keyframes sparkle-spin {
+    0% { transform: scale(0.2) rotate(0deg); opacity: 0; }
+    50% { transform: scale(1.2) rotate(180deg); opacity: 1; }
+    100% { transform: scale(0.2) rotate(360deg); opacity: 0; }
+}
+
+/* 洗車機（棒状・サイドビュー） */
+.machine {
+    position: absolute;
+    bottom: 60px; /* same floor level */
+    left: 10%;
+    width: 80px;
+    height: 300px;
+    z-index: 10;
+    transform: translateX(-50%);
+    cursor: grab;
+    touch-action: none;
+}
+.machine:active, .machine.is-dragging {
+    cursor: grabbing;
+}
+.machine.is-auto-moving {
+    transition: left 1s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.machine-pillar.center-pillar {
+    position: absolute;
+    width: 36px;
+    height: 300px;
+    left: 22px;
+    background: linear-gradient(90deg, #4b5263, #8a93a8, #303542);
+    bottom: 0;
+    z-index: 12;
+    border-left: 2px solid #222;
+    border-right: 2px solid #222;
+    box-shadow: 10px 0 20px rgba(0,0,0,0.4);
+    border-radius: 4px 4px 0 0;
+}
+.machine-pillar.center-pillar::after {
+    /* 洗車機上部の張り出し部分 */
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -20px;
+    width: 76px;
+    height: 30px;
+    background: linear-gradient(0deg, #2a2d36, #5c657a);
+    border: 2px solid #222;
+    border-radius: 4px;
+    box-shadow: 0 10px 15px rgba(0,0,0,0.5);
+    z-index: 13;
+}
+
+.brush {
+    position: absolute;
+    z-index: 11;
+    border-radius: 6px;
+    background-size: 100% 24px;
+}
+.vertical-brush {
+    top: 50px;
+    left: 15px;
+    width: 50px;
+    height: 240px;
+    background-image: repeating-linear-gradient(0deg, #00bbff, #00bbff 12px, #0055aa 12px, #0055aa 24px);
+    box-shadow: inset 10px 0 10px rgba(0,0,0,0.4), inset -10px 0 10px rgba(0,0,0,0.4);
+    border-radius: 20px;
+}
+.top-brush {
+    top: 30px;
+    left: -20px;
+    width: 120px;
+    height: 48px;
+    background-image: repeating-linear-gradient(90deg, #33ff88, #33ff88 12px, #11aa44 12px, #11aa44 24px);
+    background-size: 24px 100%;
+    box-shadow: inset 0 10px 10px rgba(0,0,0,0.3), inset 0 -10px 10px rgba(0,0,0,0.3);
+    border-radius: 24px;
+    transform-origin: center;
+    transform: rotate(5deg);
+}
+
+@keyframes spin-brush-v {
+    0% { background-position: 0 0; }
+    100% { background-position: 0 48px; }
+}
+@keyframes spin-brush-h {
+    0% { background-position: 0 0; }
+    100% { background-position: 48px 0; }
+}
+
+.machine.is-on .vertical-brush {
+    animation: spin-brush-v 0.15s linear infinite;
+}
+.machine.is-on .top-brush {
+    animation: spin-brush-h 0.15s linear infinite;
+}
+
+.water-spray {
+    position: absolute;
+    top: 40px;
+    left: -60px;
+    width: 200px;
+    height: 250px;
+    background: repeating-linear-gradient(180deg, rgba(255,255,255,0.02), rgba(150,220,255,0.2) 15px, transparent 30px);
+    background-size: 100% 60px;
+    z-index: 14;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+    clip-path: polygon(30% 0, 70% 0, 100% 100%, 0% 100%);
+}
+.machine.is-on .water-spray {
+    opacity: 0.7;
+    animation: spray-fall 0.2s linear infinite;
+}
+@keyframes spray-fall {
+    0% { background-position: 0 0; }
+    100% { background-position: 0 60px; }
+}
+
+/* コントロール周り＆UI */
+.controls {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    margin-bottom: 30px;
+    flex-wrap: wrap;
+}
+.btn {
+    padding: 18px 40px;
+    font-size: 1.2rem;
+    font-weight: 900;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    font-family: inherit;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+.btn:hover:not(:disabled) {
+    transform: translateY(-5px);
+}
+.btn:active:not(:disabled) {
+    transform: translateY(2px);
+}
+.btn:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+    filter: grayscale(1);
+}
+.btn.primary { background: #00ffcc; color: #000; box-shadow: 0 10px 20px rgba(0, 255, 204, 0.3); }
+.btn.danger { background: #ff3366; color: #fff; box-shadow: 0 10px 20px rgba(255, 51, 102, 0.3); }
+.btn.secondary { background: #ffcc00; color: #000; box-shadow: 0 10px 20px rgba(255, 204, 0, 0.3); }
+.btn.hidden { display: none; }
+
+.result-message {
+    padding: 25px 40px;
+    border-radius: 16px;
+    min-width: 400px;
+    text-align: center;
+    animation: pop-in 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    backdrop-filter: blur(10px);
+}
+.result-message.hidden {
+    display: none;
+}
+.result-message h2 {
+    font-size: 2.2rem;
+    margin-bottom: 10px;
+    font-weight: 900;
+}
+.result-message p {
+    font-size: 1.2rem;
+    opacity: 0.9;
+}
+.result-message.success { 
+    background: rgba(0, 255, 150, 0.15); 
+    border: 3px solid #00ff96; 
+    box-shadow: 0 0 30px rgba(0, 255, 150, 0.3);
+}
+.result-message.success h2 { color: #00ff96; }
+
+.result-message.warning { 
+    background: rgba(255, 150, 0, 0.15); 
+    border: 3px solid #ff9600; 
+    box-shadow: 0 0 30px rgba(255, 150, 0, 0.3);
+}
+.result-message.warning h2 { color: #ff9600; }
+
+.result-message.danger { 
+    background: rgba(255, 50, 50, 0.15); 
+    border: 3px solid #ff3232; 
+    box-shadow: 0 0 30px rgba(255, 50, 50, 0.3);
+}
+.result-message.danger h2 { color: #ff3232; }
+
+@keyframes pop-in {
+    0% { transform: scale(0.8) translateY(30px); opacity: 0; }
+    100% { transform: scale(1) translateY(0); opacity: 1; }
+}
+
+/* デバッグ情報 */
+.debug-info {
+    position: fixed;
+    bottom: 10px;
+    right: 10px;
+    font-family: monospace;
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.4);
+    background: rgba(0,0,0,0.6);
+    padding: 6px 10px;
+    border-radius: 6px;
+    z-index: 1000;
+    pointer-events: none;
+}
+
+/* レスポンシブ対応 */
+@media (max-width: 600px) {
+    .stage { height: 320px; }
+    .car-model { transform: scale(0.8); transform-origin: bottom center; }
+    .machine { transform: translateX(-50%) scale(0.8); transform-origin: bottom center; }
+    .title { font-size: 2.2rem; }
+    .btn { padding: 15px 25px; font-size: 1rem; }
+    .result-message { min-width: 90%; }
+}

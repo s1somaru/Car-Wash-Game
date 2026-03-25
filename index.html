@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Perfect Car Wash Challenge</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Outfit:wght@400;700;900&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div id="app">
+        <header>
+            <h1 class="title">パーフェクト洗車チャレンジ</h1>
+            <p class="subtitle">洗車機をスライドさせ、汚れを落としながら目標時間ピッタリでストップしよう！</p>
+            <div id="led-board" class="led-board">
+                <div class="led-row">
+                    <span class="led-label">目標時間:</span>
+                    <span id="target-time" class="led-value">--.--</span>
+                </div>
+                <div class="led-row current">
+                    <span class="led-label">経過時間:</span>
+                    <span id="current-time" class="led-value">00.00</span>
+                </div>
+            </div>
+        </header>
+
+        <main>
+            <div id="stage" class="stage">
+                <!-- ガレージの背景エフェクト -->
+                <div class="garage-lights"></div>
+
+                <!-- 車本体 -->
+                <div id="car-wrapper" class="car-wrapper">
+                    <div id="car-model" class="car-model is-dirty">
+                        <div class="car-body-bottom">
+                            <div class="dirt-layer"></div>
+                            <div class="scratch-layer"></div>
+                        </div>
+                        <div class="car-roof">
+                            <div class="dirt-layer"></div>
+                            <div class="scratch-layer"></div>
+                        </div>
+                        <div class="car-window front">
+                            <div class="dirt-layer"></div>
+                            <div class="scratch-layer"></div>
+                        </div>
+                        <div class="car-window rear">
+                            <div class="dirt-layer"></div>
+                            <div class="scratch-layer"></div>
+                        </div>
+                        <div class="wheel front-wheel">
+                            <div class="rim"></div>
+                            <div class="dirt-layer"></div>
+                        </div>
+                        <div class="wheel rear-wheel">
+                            <div class="rim"></div>
+                            <div class="dirt-layer"></div>
+                        </div>
+                        <div class="headlight"></div>
+                        <div class="taillight"></div>
+
+                        <!-- 飛び散る汚れのコンテナ -->
+                        <div id="splatter-container" class="splatter-container"></div>
+                    </div>
+                </div>
+
+                <!-- 洗車機（サイドビュー） -->
+                <div id="machine" class="machine">
+                    <div class="machine-pillar center-pillar"></div>
+                    <div class="brush vertical-brush"></div>
+                    <div class="brush top-brush"></div>
+                    <div class="water-spray"></div>
+                </div>
+                <div class="floor"></div>
+            </div>
+
+            <div class="controls">
+                <button id="start-btn" class="btn primary">洗車スタート</button>
+                <button id="stop-btn" class="btn danger" disabled>洗車ストップ</button>
+                <button id="next-btn" class="btn secondary hidden">次の車を洗う</button>
+            </div>
+
+            <div id="result-message" class="result-message hidden">
+                <h2 id="result-title"></h2>
+                <p id="result-desc"></p>
+            </div>
+        </main>
+    </div>
+    
+    <!-- デバッグ情報 -->
+    <div id="debug-info" class="debug-info">
+        DEBUG: Elapsed <span id="debug-time">0.00</span>s | Spawns stop at <span id="debug-stop">0.00</span>s remaining
+    </div>
+    
+    <script src="script.js"></script>
+</body>
+
+</html>
